@@ -2,6 +2,12 @@
 #include <vector>
 #include <string>
 
+/*
+
+A) get_command refactor?
+B) every round should get infinite commands, not just one!
+
+*/
 using namespace std;
 
 constexpr int UNDEFINED_WEAPON = 0;
@@ -20,6 +26,7 @@ constexpr int INITIAL_HEALTH = 100;
 constexpr int GAME_NOT_STARTED = 0;
 constexpr int GAME_STARTED = 1;
 const string TOKENS_DELIMITER = " ";
+const string START_OUTPUT_MESSAGE = "fight!";
 class Weapon
 {
     public:
@@ -110,7 +117,39 @@ vector<string> parse_line(string line)
     return tokens;
 }
 
+void get_command(vector<string> tokens)
+{   
+    int game_status = GAME_NOT_STARTED;
+    string command = tokens[0];
+    if (command == "start")
+    {
+        game_status = GAME_STARTED;
+        cout << START_OUTPUT_MESSAGE << endl;
+    }
 
+    else if (command == "add-user")
+    {
+        
+    }
+    else if (command == "get-money")
+    {
+        // todo
+    }
+    else if (command == "get-health")
+    {
+        //todo
+    }
+
+    else if (commnad == "go-afk")
+    {
+        //todo
+    }
+
+    else if (command == "go-atk")
+    {
+        //todo
+    }
+}
 void get_input()
 {
     int round = 4;
@@ -124,7 +163,6 @@ void get_input()
 }
 int main()
 {
-    int game_status = GAME_NOT_STARTED;
     get_input();
     return 0;
 }
