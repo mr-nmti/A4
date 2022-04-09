@@ -9,12 +9,20 @@ constexpr int HEAVY_WEAPON = 1;
 constexpr int PISTOL = 2;
 constexpr int KNIFE = 3;
 constexpr int UNBUYABLE = -1;
+//constexpr int TERRORIST = 1;
+//constexpr int COUNTER_TERRORIST = 2;
+const string TERRORIST = "terrorist";
+const string COUNTER_TERRORIST = "counter-terrorist";
+constexpr int AFK = 0;
+constexpr int ATK = 1;
+constexpr long int INITIAL_MONEY = 1000;
+constexpr int INITIAL_HEALTH = 100;
 class Weapon
 {
     public:
         Weapon(int type);
         Weapon() : Weapon(UNDEFINED_WEAPON){};
-        
+
     private:
         int type;
         long int price;
@@ -53,6 +61,34 @@ Weapon::Weapon(int in_type)
             damage = UNDEFINED_WEAPON;
             kill_prize = UNDEFINED_WEAPON;
     }
+}
+
+class Player
+{
+    public:
+        Player(string in_username, string in_team);
+        //todo
+
+    private:
+        string username;
+        string team;
+        long int money;
+        int health;
+        int play_status;
+        int death_count;
+        int kill_count;
+        vector<Weapon> weapons;
+};
+
+Player::Player(string in_username, string in_team)
+{
+    username = in_username;
+    team = in_team;
+    money = INITIAL_MONEY;
+    health = INITIAL_HEALTH;
+    play_status = ATK;
+    death_count = 0;
+    kill_count = 0;
 }
 
 int main()
