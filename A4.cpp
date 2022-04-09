@@ -17,6 +17,9 @@ constexpr int AFK = 0;
 constexpr int ATK = 1;
 constexpr long int INITIAL_MONEY = 1000;
 constexpr int INITIAL_HEALTH = 100;
+constexpr int GAME_NOT_STARTED = 0;
+constexpr int GAME_STARTED = 1;
+const string TOKENS_DELIMITER = " ";
 class Weapon
 {
     public:
@@ -90,8 +93,38 @@ Player::Player(string in_username, string in_team)
     death_count = 0;
     kill_count = 0;
 }
+/******************************************************************************/
 
+vector<string> parse_line(string line)
+{
+    vector<string> tokens;
+    size_t pos = 0;
+
+    while ((pos = line.find(TOKENS_DELIMITER)) != string::npos) 
+    {
+        tokens.push_back(line.substr(0, pos));
+        line.erase(0, pos + TOKENS_DELIMITER.length());
+    }
+    tokens.push_back(line.substr(0, pos));
+
+    return tokens;
+}
+
+
+void get_input()
+{
+    int round = 4;
+    string line;
+    for (int i = 0; i < round; i++)
+    {
+        vector<string> tokens;// name should be changed
+        getline(cin, line);
+        tokens = parse_line(line);
+    }
+}
 int main()
 {
+    int game_status = GAME_NOT_STARTED;
+    get_input();
     return 0;
 }
