@@ -6,6 +6,7 @@
 
 A) get_command refactor?
 B) every round should get infinite commands, not just one!
+C) class round should be added which contains whole game?
 
 */
 using namespace std;
@@ -27,6 +28,7 @@ constexpr int GAME_NOT_STARTED = 0;
 constexpr int GAME_STARTED = 1;
 const string TOKENS_DELIMITER = " ";
 const string START_OUTPUT_MESSAGE = "fight!";
+
 class Weapon
 {
     public:
@@ -100,6 +102,26 @@ Player::Player(string in_username, string in_team)
     death_count = 0;
     kill_count = 0;
 }
+
+class Round
+{
+    public:
+        // todo
+        Round(int r_num);
+        add_user(string in_username, string in_team);
+    
+    private:
+        int round_number;
+        vector<Player> players;
+        vector<Weapon> weapons;
+};
+Round
+Round:: add_user(string in_username, string in_team)
+{
+    Player new_player(in_username, in_team);
+    players.push_back(new_player);
+}
+
 /******************************************************************************/
 
 vector<string> parse_line(string line)
@@ -111,7 +133,7 @@ vector<string> parse_line(string line)
     {
         tokens.push_back(line.substr(0, pos));
         line.erase(0, pos + TOKENS_DELIMITER.length());
-    }
+    }   
     tokens.push_back(line.substr(0, pos));
 
     return tokens;
@@ -121,7 +143,7 @@ void get_command(vector<string> tokens)
 {   
     int game_status = GAME_NOT_STARTED;
     string command = tokens[0];
-    if (command == "start")
+    if (command == "start" && game_status == GAME_NOT_STARTED)
     {
         game_status = GAME_STARTED;
         cout << START_OUTPUT_MESSAGE << endl;
@@ -140,7 +162,7 @@ void get_command(vector<string> tokens)
         //todo
     }
 
-    else if (commnad == "go-afk")
+    else if (command== "go-afk")
     {
         //todo
     }
@@ -160,9 +182,19 @@ void get_input()
         getline(cin, line);
         tokens = parse_line(line);
     }
-}
+} 
 int main()
 {
+    Round r;
+    int round_nums;
+
+    cin >> round_nums;
+    r.round_number = round_nums;
+    cout << r.round_number << endl;
+   // for (int i = 0; i < round; i++)
+    {
+        //
+    }
     get_input();
     return 0;
 }
