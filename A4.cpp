@@ -29,6 +29,7 @@ constexpr int GAME_STARTED = 1;
 const string TOKENS_DELIMITER = " ";
 const string START_OUTPUT_MESSAGE = "fight!";
 const string USER_NOT_FOUND_MESSAGE = "user not available";
+const string GO_STATUS_MESSAGE = "ok";
 
 class Weapon
 {
@@ -84,6 +85,8 @@ class Player
         string get_username() { return username; }
         long int get_money() { return money; }
         int get_health() { return health; }
+
+        void set_play_status(int status) { play_status = status; }; 
     private:
         string username;
         string team;
@@ -116,6 +119,7 @@ class Round
         string get_name(int i) { return players[i].get_username(); }
         void get_money_command(string in_username);
         void get_health_command(string in_username);
+        void go_status_command(int status, string in_username);
     private:
         int round_number;
         vector<Player> players;
@@ -159,6 +163,20 @@ void Round:: get_health_command(string in_username)
 
     cout << players[user_index].get_health() << endl;
 }
+
+void Round:: go_status_command(int status, string in_username)
+{
+    int user_index = find_player_by_username(in_username);
+    if (user_not_found(user_index))
+        return;
+    
+    if (status == AFK)
+        players[user_index].set_play_status(AFK);
+    else if (status == ATK)
+        players[user_index].set_play_status(ATK);
+
+    cout << GO_STATUS_MESSAGE << endl;
+}
 /******************************************************************************/
 
 vector<string> parse_line(string line)
@@ -196,15 +214,12 @@ void get_command(vector<string> tokens, Round &r)
     else if (command == "get-health")
         r.get_health_command(tokens[1]);
 
-    else if (command== "go-afk")
-    {
-        //todo
-    }
+    else if (command == "go-afk")
+        r.go_status_command(AFK, tokens[1]);
 
     else if (command == "go-atk")
-    {
-        //todo
-    }
+        r.go_status_command(ATK, tokens[1]);
+ 
 }
 void get_input()
 {
