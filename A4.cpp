@@ -9,6 +9,13 @@ B) every round should get infinite commands, not just one!
 C) class round should be added which contains whole game?
 
 */
+
+
+
+/*
+A) functionilze buy error handling
+B) find_player_by_username inside Round??    should give buy function the Round obj
+*/
 using namespace std;
 
 constexpr int UNDEFINED_WEAPON = 0;
@@ -77,6 +84,9 @@ Weapon::Weapon(int in_type)
     }
 }
 
+
+
+
 class Player
 {
     public:
@@ -85,7 +95,7 @@ class Player
         string get_username() { return username; }
         long int get_money() { return money; }
         int get_health() { return health; }
-
+        int get_play_status() { return play_status; }
         void set_play_status(int status) { play_status = status; }; 
     private:
         string username;
@@ -138,44 +148,59 @@ int Round:: find_player_by_username(string in_username)
         if (in_username == players[i].get_username())
             return i;
 
-    cout << USER_NOT_FOUND_MESSAGE << endl;
+    
     return -1;
 }
 
-bool user_not_found(int index)
+bool player_not_found(int index)
 {
     return (index == -1);
 }
 void Round:: get_money_command(string in_username)
 {
     int user_index = find_player_by_username(in_username);
-    if (user_not_found(user_index))
-        return;
-
     cout << players[user_index].get_money() << endl;
 } 
 
 void Round:: get_health_command(string in_username)
 {
     int user_index = find_player_by_username(in_username);
-    if (user_not_found(user_index))
-        return;
-
     cout << players[user_index].get_health() << endl;
 }
 
 void Round:: go_status_command(int status, string in_username)
 {
     int user_index = find_player_by_username(in_username);
-    if (user_not_found(user_index))
-        return;
-    
     if (status == AFK)
         players[user_index].set_play_status(AFK);
     else if (status == ATK)
         players[user_index].set_play_status(ATK);
 
     cout << GO_STATUS_MESSAGE << endl;
+}
+
+bool is_player_afk(Player player)
+{
+    return (player.get_play_status() == AFK);
+}
+bool can_buy_weapon(Round r, Player buyer, string in_weapon)
+{
+    int buyer_index = r.find_player_by_username(buyer.get_username());
+    if (player_not_found(buyer_index) || is_player_afk(buyer))
+    {
+        cout << USER_NOT_FOUND_MESSAGE << endl;
+        return false;
+    }
+    return true;
+}
+//void Round:: buy_command(string in_username, string in_weapon)
+//{
+ //   if ()
+//}
+
+bool is_buying_available(int play_status)
+{
+    return (play_status == GAME_NOT_STARTED);
 }
 /******************************************************************************/
 
@@ -219,6 +244,13 @@ void get_command(vector<string> tokens, Round &r)
 
     else if (command == "go-atk")
         r.go_status_command(ATK, tokens[1]);
+
+    else if (command == "buy")
+    {
+        // must be functionilze
+        //if (is_buying_available(game_status))
+
+    }
  
 }
 void get_input()
