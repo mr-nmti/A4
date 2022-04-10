@@ -80,7 +80,7 @@ class Player
     public:
         Player(string in_username, string in_team);
         //todo
-
+        string get_username() { return username; }
     private:
         string username;
         string team;
@@ -107,16 +107,17 @@ class Round
 {
     public:
         // todo
-        Round(int r_num);
-        add_user(string in_username, string in_team);
+        Round(int r_num) { round_number = r_num; }
+        void add_user(string in_username, string in_team);
+        string get_name(int i) { return players[i].get_username(); }
     
     private:
         int round_number;
         vector<Player> players;
         vector<Weapon> weapons;
 };
-Round
-Round:: add_user(string in_username, string in_team)
+
+void Round:: add_user(string in_username, string in_team)
 {
     Player new_player(in_username, in_team);
     players.push_back(new_player);
@@ -139,8 +140,9 @@ vector<string> parse_line(string line)
     return tokens;
 }
 
-void get_command(vector<string> tokens)
+void get_command(vector<string> tokens, Round &r)
 {   
+    
     int game_status = GAME_NOT_STARTED;
     string command = tokens[0];
     if (command == "start" && game_status == GAME_NOT_STARTED)
@@ -150,9 +152,8 @@ void get_command(vector<string> tokens)
     }
 
     else if (command == "add-user")
-    {
-        
-    }
+        r.add_user(tokens[1], tokens[2]);
+    
     else if (command == "get-money")
     {
         // todo
@@ -185,16 +186,13 @@ void get_input()
 } 
 int main()
 {
-    Round r;
+    Round r(3);
+    string line;
+    vector<string> tokens;// name should be changed
+    getline(cin, line);
+    tokens = parse_line(line);
+    get_command(tokens, r);
     int round_nums;
 
-    cin >> round_nums;
-    r.round_number = round_nums;
-    cout << r.round_number << endl;
-   // for (int i = 0; i < round; i++)
-    {
-        //
-    }
-    get_input();
     return 0;
 }
