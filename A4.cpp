@@ -192,13 +192,13 @@ bool is_player_afk(Player player)
 }
 bool user_not_available_error(Round r, string in_username)
 {
-    int buyer_index = r.find_player_index_by_username(in_username);
-    if (player_not_found(buyer_index)) 
+    int user_index = r.find_player_index_by_username(in_username);
+    if (player_not_found(user_index)) 
     {
         cout << USER_NOT_FOUND_MESSAGE << endl;
         return false;
     }
-    if (is_player_afk(r.get_players()[buyer_index]))
+    if (is_player_afk(r.get_players()[user_index]))
     {
         cout << USER_NOT_FOUND_MESSAGE << endl;     
         return false;
