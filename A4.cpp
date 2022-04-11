@@ -10,6 +10,7 @@ C) class round should be added which contains whole game?
 
 */
 
+// chagne go_status_command argumant to play_status or sth else
 
 
 /*
@@ -38,7 +39,7 @@ const string TOKENS_DELIMITER = " ";
 const string START_OUTPUT_MESSAGE = "fight!";
 const string USER_NOT_FOUND_MESSAGE = "user not available";
 const string GO_STATUS_MESSAGE = "ok";
-
+const string BUY_WEAPON_AFTER_START_MESSAGE = "you can't buy weapons anymore";
 class Weapon
 {
     public:
@@ -132,11 +133,15 @@ class Round
         void add_user_command(string in_username, string in_team);
         int find_player_index_by_username(string in_username);
         string get_name(int i) { return players[i].get_username(); }
+        vector<Player> get_players() { return players; }
+        int get_game_status() { return game_status; }
+
         void get_money_command(string in_username);
         void get_health_command(string in_username);
-        vector<Player> get_players() { return players; }
+        void set_game_status(int in_status) { game_status = in_status; }
         void go_status_command(int status, string in_username);
     private:
+        int game_status;
         int round_number;
         vector<Player> players;
         vector<Weapon> weapons;
@@ -190,6 +195,7 @@ bool is_player_afk(Player player)
 {
     return (player.get_play_status() == AFK);
 }
+
 bool user_not_available_error(Round r, string in_username)
 {
     int user_index = r.find_player_index_by_username(in_username);
@@ -205,6 +211,12 @@ bool user_not_available_error(Round r, string in_username)
     }
 
     return true;
+}
+
+bool game_already_started_error(Round r)
+{
+    cout << BUY_WEAPON_AFTER_START_MESSAGE << endl;
+    return (r.get_game_status() == GAME_STARTED);
 }
 
 bool can_buy_weapon(Round r, string in_username, string in_weapon)
@@ -246,7 +258,7 @@ void get_command(vector<string> tokens, Round &r)
     string command = tokens[0];
     if (command == "start" && game_status == GAME_NOT_STARTED)
     {
-        game_status = GAME_STARTED;
+        r.set_game_status(GAME_STARTED);
         cout << START_OUTPUT_MESSAGE << endl;
     }
 
