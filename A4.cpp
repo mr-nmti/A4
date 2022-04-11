@@ -14,7 +14,7 @@ C) class round should be added which contains whole game?
 
 /*
 A) functionilze buy error handling
-B) find_player_by_username inside Round??    should give buy function the Round obj
+B) find_player_index_by_username inside Round??    should give buy function the Round obj
 */
 using namespace std;
 
@@ -31,6 +31,7 @@ constexpr int AFK = 0;
 constexpr int ATK = 1;
 constexpr long int INITIAL_MONEY = 1000;
 constexpr int INITIAL_HEALTH = 100;
+constexpr int INITIAL_TAG = -1;
 constexpr int GAME_NOT_STARTED = 0;
 constexpr int GAME_STARTED = 1;
 const string TOKENS_DELIMITER = " ";
@@ -96,7 +97,9 @@ class Player
         long int get_money() { return money; }
         int get_health() { return health; }
         int get_play_status() { return play_status; }
+        int get_tag() { return tag; }
         void set_play_status(int status) { play_status = status; }; 
+        void set_tag(int in_tag) { tag = in_tag; }
     private:
         string username;
         string team;
@@ -106,6 +109,7 @@ class Player
         int death_count;
         int kill_count;
         vector<Weapon> weapons;
+        int tag;
 };
 
 Player::Player(string in_username, string in_team)
@@ -117,6 +121,7 @@ Player::Player(string in_username, string in_team)
     play_status = ATK;
     death_count = 0;
     kill_count = 0;
+    tag = INITIAL_TAG;
 }
 
 class Round
@@ -125,10 +130,11 @@ class Round
         // todo
         Round(int r_num) { round_number = r_num; }
         void add_user_command(string in_username, string in_team);
-        int find_player_by_username(string in_username);
+        int find_player_index_by_username(string in_username);
         string get_name(int i) { return players[i].get_username(); }
         void get_money_command(string in_username);
         void get_health_command(string in_username);
+        vector<Player> get_players() { return players; }
         void go_status_command(int status, string in_username);
     private:
         int round_number;
@@ -139,10 +145,11 @@ class Round
 void Round:: add_user_command(string in_username, string in_team)
 {
     Player new_player(in_username, in_team);
+    new_player.set_tag(players.size());
     players.push_back(new_player);
 }
 
-int Round:: find_player_by_username(string in_username)
+int Round:: find_player_index_by_username(string in_username)
 {
     for (int i = 0; i < players.size(); i++)
         if (in_username == players[i].get_username())
@@ -158,19 +165,19 @@ bool player_not_found(int index)
 }
 void Round:: get_money_command(string in_username)
 {
-    int user_index = find_player_by_username(in_username);
+    int user_index = find_player_index_by_username(in_username);
     cout << players[user_index].get_money() << endl;
 } 
 
 void Round:: get_health_command(string in_username)
 {
-    int user_index = find_player_by_username(in_username);
+    int user_index = find_player_index_by_username(in_username);
     cout << players[user_index].get_health() << endl;
 }
 
 void Round:: go_status_command(int status, string in_username)
 {
-    int user_index = find_player_by_username(in_username);
+    int user_index = find_player_index_by_username(in_username);
     if (status == AFK)
         players[user_index].set_play_status(AFK);
     else if (status == ATK)
@@ -183,14 +190,27 @@ bool is_player_afk(Player player)
 {
     return (player.get_play_status() == AFK);
 }
-bool can_buy_weapon(Round r, Player buyer, string in_weapon)
+bool user_not_available_error(Round r, string in_username)
 {
-    int buyer_index = r.find_player_by_username(buyer.get_username());
-    if (player_not_found(buyer_index) || is_player_afk(buyer))
+    int buyer_index = r.find_player_index_by_username(in_username);
+    if (player_not_found(buyer_index)) 
     {
         cout << USER_NOT_FOUND_MESSAGE << endl;
         return false;
     }
+    if (is_player_afk(r.get_players()[buyer_index]))
+    {
+        cout << USER_NOT_FOUND_MESSAGE << endl;     
+        return false;
+    }
+
+    return true;
+}
+
+bool can_buy_weapon(Round r, string in_username, string in_weapon)
+{
+    //int buyer_index = r.find_player_index_by_username(in_username);
+
     return true;
 }
 //void Round:: buy_command(string in_username, string in_weapon)
