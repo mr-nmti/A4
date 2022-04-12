@@ -276,10 +276,13 @@ bool weapon_is_available_check(Round r, string in_weapon_name)
     return true;
 }
 
-bool game_already_started_error(Round r)
+bool round_already_started_check(Round r)
 {
-    cout << BUY_WEAPON_AFTER_START_MESSAGE << endl;
-    return (r.get_game_status() == GAME_STARTED);
+    bool game_started_check = (r.get_game_status() == GAME_STARTED);
+    if (game_started_check)
+        cout << BUY_WEAPON_AFTER_START_MESSAGE << endl;
+
+    return game_started_check;
 }
 
 bool player_has_this_weapon_check(Round r, string in_username, string in_weapon_name)
@@ -303,14 +306,19 @@ bool player_has_enough_money(Round r, string in_username, string in_weapon_name)
 
     return (has_enough);
 }
-bool can_buy_weapon(Round r, string in_username, string in_weapon)
+bool can_buy_weapon(Round r, string in_username, string in_weapon_name)
 {
     //int buyer_index = r.find_player_index_by_username(in_username);
     //int buyer_index = r.find_player_index_by_username(in_username);
     //if (user_is_available_check(r, in_username))
     //{
         // todo
-    
+    //bool result;
+   // if (user_is_available_check(r, in_username) && weapon_is_available_check(r, in_weapon_name))
+  //  {
+
+     //   result = (!round_alr)
+    //}
     return true;
     //}
 }
