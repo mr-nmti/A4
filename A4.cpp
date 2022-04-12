@@ -43,7 +43,7 @@ const string USER_NOT_FOUND_MESSAGE = "user not available";
 const string GO_STATUS_MESSAGE = "ok";
 const string BUY_WEAPON_AFTER_START_MESSAGE = "you can't buy weapons anymore";
 const string WEAPON_NOT_FOUND_MESSAGE = "weapon not available";
-
+const string PLAYEY_HAS_THE_WEAPON_MESSAGE = "you already have this weapon";
 class Weapon
 {
     public:
@@ -280,9 +280,17 @@ bool game_already_started_error(Round r)
 
 bool player_has_this_weapon_check(Round r, string in_username, string in_weapon_name)
 {
-    return r.is_weapon_in_player_inventory(in_username, in_weapon_name);
+    bool has_weapon = r.is_weapon_in_player_inventory(in_username, in_weapon_name);
+    if (has_weapon == true)
+        cout << PLAYEY_HAS_THE_WEAPON_MESSAGE << endl;
+
+    return has_weapon;
 }
 
+//bool player_has_enough_money(string in_username, string in_weapon)
+//{
+
+//}
 bool can_buy_weapon(Round r, string in_username, string in_weapon)
 {
     //int buyer_index = r.find_player_index_by_username(in_username);
@@ -290,6 +298,7 @@ bool can_buy_weapon(Round r, string in_username, string in_weapon)
     //if (user_is_available_check(r, in_username))
     //{
         // todo
+    
     return true;
     //}
 }
@@ -346,7 +355,8 @@ void get_command(vector<string> tokens, Round &r)
         r.go_status_command(ATK, tokens[1]);
 
     else if (command == "buy")
-    {
+    {   
+        bool a = can_buy_weapon(r, tokens[1], tokens[2]);
         // must be functionilze
         //if (is_buying_available(game_status))
 
