@@ -42,12 +42,14 @@ const string START_OUTPUT_MESSAGE = "fight!";
 const string USER_NOT_FOUND_MESSAGE = "user not available";
 const string GO_STATUS_MESSAGE = "ok";
 const string BUY_WEAPON_AFTER_START_MESSAGE = "you can't buy weapons anymore";
+const string WEAPON_NOT_FOUND_MESSAGE = "weapon not available";
 class Weapon
 {
     public:
         Weapon(int type);
         Weapon() : Weapon(UNDEFINED_WEAPON){};
 
+        string get_name() { return name; }
     private:
         string name;
         int type;
@@ -139,6 +141,7 @@ class Round
         Round(int r_num) { round_number = r_num; }
         void add_user_command(string in_username, string in_team);
         int find_player_index_by_username(string in_username);
+        int find_weapon_index_by_name(string in_name);
         string get_name(int i) { return players[i].get_username(); }
         vector<Player> get_players() { return players; }
         int get_game_status() { return game_status; }
@@ -172,7 +175,19 @@ int Round:: find_player_index_by_username(string in_username)
     return -1;
 }
 
+int Round:: find_weapon_index_by_name(string in_name)
+{
+    for (int i = 0; i < weapons.size(); i++)
+        if (in_name == weapons[i].get_name())
+            return i;
+
+    return -1;
+}
 bool player_not_found(int index)
+{
+    return (index == -1);
+}
+bool weapon_not_found(int index)
 {
     return (index == -1);
 }
@@ -230,11 +245,24 @@ bool user_not_available_error(Round r, string in_username)
     return true;
 }
 
+bool weapon_not_available_error(Round r, string in_weapon_name)
+{
+    int weapon_index = r.find_weapon_index_by_name(in_weapon_name);
+    if (weapon_not_found(weapon_index))
+    {
+        cout << WEAPON_NOT_FOUND_MESSAGE << endl;
+        return false;
+    }
+    
+    return true;
+}
+
 bool game_already_started_error(Round r)
 {
     cout << BUY_WEAPON_AFTER_START_MESSAGE << endl;
     return (r.get_game_status() == GAME_STARTED);
 }
+
 
 bool can_buy_weapon(Round r, string in_username, string in_weapon)
 {
