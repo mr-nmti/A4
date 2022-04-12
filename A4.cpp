@@ -44,6 +44,7 @@ const string GO_STATUS_MESSAGE = "ok";
 const string BUY_WEAPON_AFTER_START_MESSAGE = "you can't buy weapons anymore";
 const string WEAPON_NOT_FOUND_MESSAGE = "weapon not available";
 const string PLAYEY_HAS_THE_WEAPON_MESSAGE = "you already have this weapon";
+const string PLAYER_HAS_NOT_ENOUGH_MONEY_MESSAGE = "insufficient money";
 class Weapon
 {
     public:
@@ -51,6 +52,7 @@ class Weapon
         Weapon() : Weapon(UNDEFINED_WEAPON){};
 
         string get_name() { return name; }
+        long int get_price() { return price; }
     private:
         string name;
         int type;
@@ -146,8 +148,10 @@ class Round
         int find_player_index_by_username(string in_username);
         int find_weapon_index_by_name(string in_name);
         bool is_weapon_in_player_inventory(string in_username, string in_weapon_name);
+        bool is_player_money_sufficient(int user_index, int weapon_index);
         string get_name(int i) { return players[i].get_username(); }
         vector<Player> get_players() { return players; }
+        vector<Weapon> get_weapons() { return weapons; }
         int get_game_status() { return game_status; }
 
         void get_money_command(string in_username);
@@ -281,16 +285,24 @@ bool game_already_started_error(Round r)
 bool player_has_this_weapon_check(Round r, string in_username, string in_weapon_name)
 {
     bool has_weapon = r.is_weapon_in_player_inventory(in_username, in_weapon_name);
-    if (has_weapon == true)
+    if (has_weapon)
         cout << PLAYEY_HAS_THE_WEAPON_MESSAGE << endl;
 
     return has_weapon;
 }
 
-//bool player_has_enough_money(string in_username, string in_weapon)
-//{
+bool player_has_enough_money(Round r, string in_username, string in_weapon_name)
+{
+    int user_index = r.find_player_index_by_username(in_username);
+    int weapon_index = r.find_weapon_index_by_name(in_weapon_name);
+    long int user_money = r.get_players()[user_index].get_money();
+    long int weapon_price = r.get_weapons()[weapon_index].get_price();
+    bool has_enough = weapon_price <= user_money;
+    if (!has_enough)
+        cout << PLAYER_HAS_NOT_ENOUGH_MONEY_MESSAGE << endl;
 
-//}
+    return (has_enough);
+}
 bool can_buy_weapon(Round r, string in_username, string in_weapon)
 {
     //int buyer_index = r.find_player_index_by_username(in_username);
