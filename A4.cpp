@@ -35,8 +35,8 @@ constexpr int ATK = 1;
 constexpr long int INITIAL_MONEY = 1000;
 constexpr int INITIAL_HEALTH = 100;
 constexpr int INITIAL_TAG = -1;
-constexpr int GAME_NOT_STARTED = 0;
-constexpr int GAME_STARTED = 1;
+constexpr bool GAME_NOT_STARTED = false;
+constexpr bool GAME_STARTED = true;
 const string TOKENS_DELIMITER = " ";
 const string START_OUTPUT_MESSAGE = "fight!";
 const string USER_NOT_FOUND_MESSAGE = "user not available";
@@ -152,15 +152,15 @@ class Round
         string get_name(int i) { return players[i].get_username(); }
         vector<Player> get_players() { return players; }
         vector<Weapon> get_weapons() { return weapons; }
-        int get_game_status() { return game_status; }
+        bool get_game_status() { return game_status; }
 
         void get_money_command(string in_username);
         void get_health_command(string in_username);
-        void set_game_status(int in_status) { game_status = in_status; }
+        void set_game_status(bool in_status) { game_status = in_status; }
         void go_status_command(int status, string in_username);
         void make_weapons();
     private:
-        int game_status;
+        bool game_status;
         int round_number;
         vector<Player> players;
         vector<Weapon> weapons;
@@ -278,7 +278,7 @@ bool weapon_is_available_check(Round r, string in_weapon_name)
 
 bool round_already_started_check(Round r)
 {
-    bool game_started_check = (r.get_game_status() == GAME_STARTED);
+    bool game_started_check = r.get_game_status();
     if (game_started_check)
         cout << BUY_WEAPON_AFTER_START_MESSAGE << endl;
 
@@ -304,8 +304,9 @@ bool player_has_enough_money(Round r, string in_username, string in_weapon_name)
     if (!has_enough)
         cout << PLAYER_HAS_NOT_ENOUGH_MONEY_MESSAGE << endl;
 
-    return (has_enough);
+    return has_enough;
 }
+
 bool can_buy_weapon(Round r, string in_username, string in_weapon_name)
 {
     //int buyer_index = r.find_player_index_by_username(in_username);
@@ -313,12 +314,12 @@ bool can_buy_weapon(Round r, string in_username, string in_weapon_name)
     //if (user_is_available_check(r, in_username))
     //{
         // todo
-    //bool result;
-   // if (user_is_available_check(r, in_username) && weapon_is_available_check(r, in_weapon_name))
-  //  {
+    bool result;
+    if (user_is_available_check(r, in_username) && weapon_is_available_check(r, in_weapon_name))
+    {
 
-     //   result = (!round_alr)
-    //}
+      //result = (!round_alr)
+    }
     return true;
     //}
 }
@@ -327,10 +328,6 @@ bool can_buy_weapon(Round r, string in_username, string in_weapon_name)
  //   if ()
 //}
 
-bool is_buying_available(int play_status)
-{
-    return (play_status == GAME_NOT_STARTED);
-}
 /******************************************************************************/
 
 vector<string> parse_line(string line)
@@ -351,7 +348,7 @@ vector<string> parse_line(string line)
 void get_command(vector<string> tokens, Round &r)
 {   
     
-    int game_status = GAME_NOT_STARTED;
+    bool game_status = GAME_NOT_STARTED;
     string command = tokens[0];
     if (command == "start" && game_status == GAME_NOT_STARTED)
     {
