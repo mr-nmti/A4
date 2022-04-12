@@ -25,7 +25,7 @@ constexpr int HEAVY_WEAPON = 1;
 constexpr int PISTOL = 2;
 constexpr int KNIFE = 3;
 constexpr int UNBUYABLE = -1;
-
+constexpr int INITIAL_WEAPON = KNIFE;
 //constexpr int TERRORIST = 1;
 //constexpr int COUNTER_TERRORIST = 2;
 const string TERRORIST = "terrorist";
@@ -43,6 +43,7 @@ const string USER_NOT_FOUND_MESSAGE = "user not available";
 const string GO_STATUS_MESSAGE = "ok";
 const string BUY_WEAPON_AFTER_START_MESSAGE = "you can't buy weapons anymore";
 const string WEAPON_NOT_FOUND_MESSAGE = "weapon not available";
+
 class Weapon
 {
     public:
@@ -133,6 +134,7 @@ Player::Player(string in_username, string in_team)
     death_count = 0;
     kill_count = 0;
     tag = INITIAL_TAG;
+    weapons.push_back(Weapon(INITIAL_WEAPON));
 }
 
 class Round
