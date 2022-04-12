@@ -32,6 +32,11 @@ const string TERRORIST = "terrorist";
 const string COUNTER_TERRORIST = "counter-terrorist";
 constexpr int AFK = 0;
 constexpr int ATK = 1;
+constexpr int DEATH_HEALTH = 0;
+constexpr bool DEAD = true;
+constexpr bool ALIVE = false;
+constexpr int ATTACKER = 1;
+constexpr int DEFENDER = 2;
 constexpr long int INITIAL_MONEY = 1000;
 constexpr int INITIAL_HEALTH = 100;
 constexpr int INITIAL_TAG = -1;
@@ -48,6 +53,8 @@ const string PLAYEY_HAS_THE_WEAPON_MESSAGE = "you already have this weapon";
 const string PLAYER_HAS_NOT_ENOUGH_MONEY_MESSAGE = "insufficient money";
 const string SUCCESSFUL_WEAPON_BUY_MESSAGE = "weapon bought successfully";
 const string PLAYER_NOT_HAVE_THE_WEAPON_MESSAGE = "attacker doesn't have this gun";
+const string DEAD_ATTACKER_MESSAGE = "attacker is dead";
+const string DEAD_DEFENDER_MESSAGE = "attacked is dead";
 class Weapon
 {
     public:
@@ -114,6 +121,7 @@ class Player
         int get_health() { return health; }
         int get_play_status() { return play_status; }
         int get_tag() { return tag; }
+        //bool get_is_dead() { return is_dead; }
         vector<Weapon> get_weapons() { return weapons; }
         void set_play_status(int status) { play_status = status; }; 
         void set_tag(int in_tag) { tag = in_tag; }
@@ -121,6 +129,7 @@ class Player
     private:
         string username;
         string team;
+        //bool is_dead;
         long int money;
         int health;
         int play_status;
@@ -134,6 +143,7 @@ Player::Player(string in_username, string in_team)
 {
     username = in_username;
     team = in_team;
+
     money = INITIAL_MONEY;
     health = INITIAL_HEALTH;
     play_status = ATK;
@@ -355,7 +365,32 @@ bool attacker_has_weapon_to_shoot(Round r, string in_attacker_username, string i
 
     return has_weapon;
 }
+bool is_player_dead_check(Round r, string in_username, int player_type)
+{
+    int player_index = r.find_player_index_by_username(in_username);
+    bool death_condition = (r.get_players()[player_index].get_health() <= DEATH_HEALTH);
 
+    if (death_condition == DEAD && player_type == ATTACKER)
+        cout << DEAD_ATTACKER_MESSAGE << endl;
+    
+    else if (death_condition == DEAD && player_type == DEFENDER)
+        cout << DEAD_DEFENDER_MESSAGE << endl;
+
+    return death_condition;
+}
+
+bool can_shoot(Round r, string in_attacker_username, 
+               string in_defender_username, string in_weapon_name)
+{
+    bool result = false;
+    if (user_is_available_check(r, in_attacker_username) && 
+    user_is_available_check(r, in_defender_username) &&
+    attacker_has_weapon_to_shoot(r, in_attacker_username, in_weapon_name))
+    {
+        //
+    }
+    return true;
+}
 /******************************************************************************/
 
 vector<string> parse_line(string line)
