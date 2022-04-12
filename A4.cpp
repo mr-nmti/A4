@@ -19,11 +19,13 @@ B) find_player_index_by_username inside Round??    should give buy function the 
 */
 using namespace std;
 
+constexpr int ALL_WEAPON_NUMBER = 3;
 constexpr int UNDEFINED_WEAPON = 0;
 constexpr int HEAVY_WEAPON = 1;
 constexpr int PISTOL = 2;
 constexpr int KNIFE = 3;
 constexpr int UNBUYABLE = -1;
+
 //constexpr int TERRORIST = 1;
 //constexpr int COUNTER_TERRORIST = 2;
 const string TERRORIST = "terrorist";
@@ -47,6 +49,7 @@ class Weapon
         Weapon() : Weapon(UNDEFINED_WEAPON){};
 
     private:
+        string name;
         int type;
         long int price;
         int damage;
@@ -58,6 +61,7 @@ Weapon::Weapon(int in_type)
     switch (in_type)
     {
         case HEAVY_WEAPON:
+            name = "heavy";
             type = HEAVY_WEAPON;
             price = 3000;
             damage = 45;
@@ -65,6 +69,7 @@ Weapon::Weapon(int in_type)
             break;
         
         case PISTOL:
+            name = "pistol";
             type = PISTOL;
             price = 400;
             damage = 20;
@@ -72,6 +77,7 @@ Weapon::Weapon(int in_type)
             break;
 
         case KNIFE:
+            name = "knife";
             type = KNIFE;
             price = UNBUYABLE;
             damage = 35;
@@ -79,6 +85,7 @@ Weapon::Weapon(int in_type)
             break;
         
         default:
+            name = "";
             type = UNDEFINED_WEAPON;
             price = UNDEFINED_WEAPON;
             damage = UNDEFINED_WEAPON;
@@ -140,6 +147,7 @@ class Round
         void get_health_command(string in_username);
         void set_game_status(int in_status) { game_status = in_status; }
         void go_status_command(int status, string in_username);
+        void make_weapons();
     private:
         int game_status;
         int round_number;
@@ -189,6 +197,15 @@ void Round:: go_status_command(int status, string in_username)
         players[user_index].set_play_status(ATK);
 
     cout << GO_STATUS_MESSAGE << endl;
+}
+
+void Round:: make_weapons()
+{
+    for(int i = 1; i <= ALL_WEAPON_NUMBER; i++)
+    {
+        Weapon new_weapon(i);
+        weapons.push_back(new_weapon);
+    }
 }
 
 bool is_player_afk(Player player)
@@ -299,6 +316,7 @@ void get_input()
 int main()
 {
     Round r(3);
+    r.make_weapons();
     string line;
     vector<string> tokens;// name should be changed
     while(1)
