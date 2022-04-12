@@ -108,6 +108,7 @@ class Player
         int get_health() { return health; }
         int get_play_status() { return play_status; }
         int get_tag() { return tag; }
+        vector<Weapon> get_weapons() { return weapons; }
         void set_play_status(int status) { play_status = status; }; 
         void set_tag(int in_tag) { tag = in_tag; }
     private:
@@ -142,6 +143,7 @@ class Round
         void add_user_command(string in_username, string in_team);
         int find_player_index_by_username(string in_username);
         int find_weapon_index_by_name(string in_name);
+        bool is_weapon_in_player_inventory(string in_username, string in_weapon_name);
         string get_name(int i) { return players[i].get_username(); }
         vector<Player> get_players() { return players; }
         int get_game_status() { return game_status; }
@@ -223,12 +225,23 @@ void Round:: make_weapons()
     }
 }
 
+bool Round:: is_weapon_in_player_inventory(string in_username, string in_weapon_name)
+{
+    int user_index = find_player_index_by_username(in_username);
+
+    for (int i = 0; i < players[user_index].get_weapons().size(); i++)
+        if (in_weapon_name == players[user_index].get_weapons()[i].get_name())
+            return true;
+    
+    return false;
+}
+
 bool is_player_afk(Player player)
 {
     return (player.get_play_status() == AFK);
 }
 
-bool user_not_available_error(Round r, string in_username)
+bool user_is_available_check(Round r, string in_username)
 {
     int user_index = r.find_player_index_by_username(in_username);
     if (player_not_found(user_index)) 
@@ -245,7 +258,7 @@ bool user_not_available_error(Round r, string in_username)
     return true;
 }
 
-bool weapon_not_available_error(Round r, string in_weapon_name)
+bool weapon_is_available_check(Round r, string in_weapon_name)
 {
     int weapon_index = r.find_weapon_index_by_name(in_weapon_name);
     if (weapon_not_found(weapon_index))
@@ -263,12 +276,20 @@ bool game_already_started_error(Round r)
     return (r.get_game_status() == GAME_STARTED);
 }
 
+bool player_has_this_weapon_check(Round r, string in_username, string in_weapon_name)
+{
+    return r.is_weapon_in_player_inventory(in_username, in_weapon_name);
+}
 
 bool can_buy_weapon(Round r, string in_username, string in_weapon)
 {
     //int buyer_index = r.find_player_index_by_username(in_username);
-
+    //int buyer_index = r.find_player_index_by_username(in_username);
+    //if (user_is_available_check(r, in_username))
+    //{
+        // todo
     return true;
+    //}
 }
 //void Round:: buy_command(string in_username, string in_weapon)
 //{
