@@ -35,16 +35,18 @@ constexpr int ATK = 1;
 constexpr long int INITIAL_MONEY = 1000;
 constexpr int INITIAL_HEALTH = 100;
 constexpr int INITIAL_TAG = -1;
-constexpr bool GAME_NOT_STARTED = false;
-constexpr bool GAME_STARTED = true;
+constexpr bool ROUND_NOT_STARTED = false;
+constexpr bool ROUND_STARTED = true;
 const string TOKENS_DELIMITER = " ";
 const string START_OUTPUT_MESSAGE = "fight!";
 const string USER_NOT_FOUND_MESSAGE = "user not available";
 const string GO_STATUS_MESSAGE = "ok";
+const string ADD_USER_DONE_MESSAGE = "ok";
 const string BUY_WEAPON_AFTER_START_MESSAGE = "you can't buy weapons anymore";
 const string WEAPON_NOT_FOUND_MESSAGE = "weapon not available";
 const string PLAYEY_HAS_THE_WEAPON_MESSAGE = "you already have this weapon";
 const string PLAYER_HAS_NOT_ENOUGH_MONEY_MESSAGE = "insufficient money";
+const string SUCCESSFUL_WEAPON_BUY_MESSAGE = "weapon bought successfully";
 class Weapon
 {
     public:
@@ -114,6 +116,7 @@ class Player
         vector<Weapon> get_weapons() { return weapons; }
         void set_play_status(int status) { play_status = status; }; 
         void set_tag(int in_tag) { tag = in_tag; }
+        void set_bought_weapon(Weapon bought_weapon);
     private:
         string username;
         string team;
@@ -139,11 +142,16 @@ Player::Player(string in_username, string in_team)
     weapons.push_back(Weapon(INITIAL_WEAPON));
 }
 
+void Player:: set_bought_weapon(Weapon bought_weapon)
+{
+   weapons.push_back(bought_weapon);
+   money = money - bought_weapon.get_price();
+}
 class Round
 {
     public:
         // todo
-        Round(int r_num) { round_number = r_num; }
+        Round(int r_num);
         void add_user_command(string in_username, string in_team);
         int find_player_index_by_username(string in_username);
         int find_weapon_index_by_name(string in_name);
@@ -153,7 +161,7 @@ class Round
         vector<Player> get_players() { return players; }
         vector<Weapon> get_weapons() { return weapons; }
         bool get_game_status() { return game_status; }
-
+        void buy_command(string in_username, string in_weapon_name);
         void get_money_command(string in_username);
         void get_health_command(string in_username);
         void set_game_status(bool in_status) { game_status = in_status; }
@@ -166,11 +174,17 @@ class Round
         vector<Weapon> weapons;
 };
 
+Round:: Round(int r_num)
+{
+    round_number = r_num;
+    game_status = ROUND_NOT_STARTED;
+}
 void Round:: add_user_command(string in_username, string in_team)
 {
     Player new_player(in_username, in_team);
     new_player.set_tag(players.size());
     players.push_back(new_player);
+    cout << ADD_USER_DONE_MESSAGE << endl;
 }
 
 int Round:: find_player_index_by_username(string in_username)
@@ -307,27 +321,31 @@ bool player_has_enough_money(Round r, string in_username, string in_weapon_name)
     return has_enough;
 }
 
-bool can_buy_weapon(Round r, string in_username, string in_weapon_name)
+bool can_buy_weapon( Round r, string in_username, string in_weapon_name)
 {
-    //int buyer_index = r.find_player_index_by_username(in_username);
-    //int buyer_index = r.find_player_index_by_username(in_username);
-    //if (user_is_available_check(r, in_username))
-    //{
-        // todo
-    bool result;
+    bool result = false;
     if (user_is_available_check(r, in_username) && weapon_is_available_check(r, in_weapon_name))
     {
+        result = ((round_already_started_check(r) == ROUND_NOT_STARTED) && 
+        !player_has_this_weapon_check(r, in_username, in_weapon_name) &&
+        player_has_enough_money(r, in_username, in_weapon_name));
 
-      //result = (!round_alr)
     }
-    return true;
-    //}
+    
+    return result;
 }
-//void Round:: buy_command(string in_username, string in_weapon)
-//{
- //   if ()
-//}
 
+void Round:: buy_command( string in_username, string in_weapon_name)
+{
+    if (can_buy_weapon(*this, in_username, in_weapon_name))
+    {
+        int player_index = find_player_index_by_username(in_username);
+        int weapon_index = find_weapon_index_by_name(in_weapon_name);
+        Weapon bought_weapon(weapon_index + 1);
+        players[player_index].set_bought_weapon(bought_weapon);
+        cout << SUCCESSFUL_WEAPON_BUY_MESSAGE << endl;
+    }
+}
 /******************************************************************************/
 
 vector<string> parse_line(string line)
@@ -348,11 +366,11 @@ vector<string> parse_line(string line)
 void get_command(vector<string> tokens, Round &r)
 {   
     
-    bool game_status = GAME_NOT_STARTED;
+    bool game_status = ROUND_NOT_STARTED;
     string command = tokens[0];
-    if (command == "start" && game_status == GAME_NOT_STARTED)
+    if (command == "start" && game_status == ROUND_NOT_STARTED)
     {
-        r.set_game_status(GAME_STARTED);
+        r.set_game_status(ROUND_STARTED);
         cout << START_OUTPUT_MESSAGE << endl;
     }
 
@@ -373,9 +391,7 @@ void get_command(vector<string> tokens, Round &r)
 
     else if (command == "buy")
     {   
-        bool a = can_buy_weapon(r, tokens[1], tokens[2]);
-        // must be functionilze
-        //if (is_buying_available(game_status))
+        r.buy_command(tokens[1], tokens[2]);
 
     }
  
