@@ -55,6 +55,7 @@ const string SUCCESSFUL_WEAPON_BUY_MESSAGE = "weapon bought successfully";
 const string PLAYER_NOT_HAVE_THE_WEAPON_MESSAGE = "attacker doesn't have this gun";
 const string DEAD_ATTACKER_MESSAGE = "attacker is dead";
 const string DEAD_DEFENDER_MESSAGE = "attacked is dead";
+const string PLAYERS_ARE_SAME_TEAM_MESSAGE = "you can't shoot this player";
 class Weapon
 {
     public:
@@ -121,6 +122,7 @@ class Player
         int get_health() { return health; }
         int get_play_status() { return play_status; }
         int get_tag() { return tag; }
+        string get_team() { return team; }
         //bool get_is_dead() { return is_dead; }
         vector<Weapon> get_weapons() { return weapons; }
         void set_play_status(int status) { play_status = status; }; 
@@ -379,6 +381,18 @@ bool is_player_dead_check(Round r, string in_username, int player_type)
     return death_condition;
 }
 
+bool are_players_in_same_teams(Round r, string in_attacker_username, string in_defender_username)
+{
+    int attacker_index = r.find_player_index_by_username(in_attacker_username);
+    int defender_index = r.find_player_index_by_username(in_defender_username);
+    string attacker_team = r.get_players()[attacker_index].get_team();
+    string defender_team = r.get_players()[defender_index].get_team();
+    bool are_in_same_team = (attacker_team == defender_team);
+    if (are_in_same_team)
+        cout << PLAYERS_ARE_SAME_TEAM_MESSAGE << endl;
+
+    return are_in_same_team;
+}
 bool can_shoot(Round r, string in_attacker_username, 
                string in_defender_username, string in_weapon_name)
 {
