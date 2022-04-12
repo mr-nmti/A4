@@ -47,6 +47,7 @@ const string WEAPON_NOT_FOUND_MESSAGE = "weapon not available";
 const string PLAYEY_HAS_THE_WEAPON_MESSAGE = "you already have this weapon";
 const string PLAYER_HAS_NOT_ENOUGH_MONEY_MESSAGE = "insufficient money";
 const string SUCCESSFUL_WEAPON_BUY_MESSAGE = "weapon bought successfully";
+const string PLAYER_NOT_HAVE_THE_WEAPON_MESSAGE = "attacker doesn't have this gun";
 class Weapon
 {
     public:
@@ -321,7 +322,7 @@ bool player_has_enough_money(Round r, string in_username, string in_weapon_name)
     return has_enough;
 }
 
-bool can_buy_weapon( Round r, string in_username, string in_weapon_name)
+bool can_buy_weapon(Round r, string in_username, string in_weapon_name)
 {
     bool result = false;
     if (user_is_available_check(r, in_username) && weapon_is_available_check(r, in_weapon_name))
@@ -346,6 +347,15 @@ void Round:: buy_command( string in_username, string in_weapon_name)
         cout << SUCCESSFUL_WEAPON_BUY_MESSAGE << endl;
     }
 }
+bool attacker_has_weapon_to_shoot(Round r, string in_attacker_username, string in_weapon_name)
+{
+    bool has_weapon = r.is_weapon_in_player_inventory(in_attacker_username, in_weapon_name);
+    if (!has_weapon)
+        cout << PLAYER_NOT_HAVE_THE_WEAPON_MESSAGE << endl;
+
+    return has_weapon;
+}
+
 /******************************************************************************/
 
 vector<string> parse_line(string line)
@@ -390,10 +400,9 @@ void get_command(vector<string> tokens, Round &r)
         r.go_status_command(ATK, tokens[1]);
 
     else if (command == "buy")
-    {   
         r.buy_command(tokens[1], tokens[2]);
 
-    }
+    
  
 }
 void get_input()
