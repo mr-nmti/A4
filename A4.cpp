@@ -113,21 +113,16 @@ Weapon::Weapon(int in_type)
     }
 }
 
-
-
-
 class Player
 {
     public:
         Player(string in_username, string in_team);
-        //todo
         string get_username() { return username; }
         long int get_money() { return money; }
         int get_health() { return health; }
         int get_play_status() { return play_status; }
         int get_tag() { return tag; }
         string get_team() { return team; }
-        //bool get_is_dead() { return is_dead; }
         vector<Weapon> get_weapons() { return weapons; }
         void set_play_status(int status) { play_status = status; }; 
         void set_tag(int in_tag) { tag = in_tag; }
@@ -140,7 +135,6 @@ class Player
     private:
         string username;
         string team;
-        //bool is_dead;
         long int money;
         int health;
         int play_status;
@@ -373,7 +367,6 @@ bool can_buy_weapon(Round r, string in_username, string in_weapon_name)
         result = ((round_already_started_check(r, "buy") == ROUND_NOT_STARTED) && 
         !player_has_this_weapon_check(r, in_username, in_weapon_name) &&
         player_has_enough_money(r, in_username, in_weapon_name));
-
     }
     
     return result;
@@ -390,6 +383,7 @@ void Round:: buy_command( string in_username, string in_weapon_name)
         cout << SUCCESSFUL_WEAPON_BUY_MESSAGE << endl;
     }
 }
+
 bool attacker_has_weapon_to_shoot(Round r, string in_attacker_username, string in_weapon_name)
 {
     bool has_weapon = r.is_weapon_in_player_inventory(in_attacker_username, in_weapon_name);
@@ -398,6 +392,7 @@ bool attacker_has_weapon_to_shoot(Round r, string in_attacker_username, string i
 
     return has_weapon;
 }
+
 bool is_player_dead_check(Round r, string in_username, int player_type)
 {
     int player_index = r.find_player_index_by_username(in_username);
