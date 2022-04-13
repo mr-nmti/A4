@@ -56,6 +56,7 @@ const string PLAYER_NOT_HAVE_THE_WEAPON_MESSAGE = "attacker doesn't have this gu
 const string DEAD_ATTACKER_MESSAGE = "attacker is dead";
 const string DEAD_DEFENDER_MESSAGE = "attacked is dead";
 const string PLAYERS_ARE_SAME_TEAM_MESSAGE = "you can't shoot this player";
+const string SHOOT_BEFORE_START_MESSAGE = "The game hasn't started yet";
 class Weapon
 {
     public:
@@ -303,12 +304,14 @@ bool weapon_is_available_check(Round r, string in_weapon_name)
     return true;
 }
 
-bool round_already_started_check(Round r)
+bool round_already_started_check(Round r, string command)
 {
     bool game_started_check = r.get_game_status();
-    if (game_started_check)
+    if (game_started_check == ROUND_STARTED && command == "buy")
         cout << BUY_WEAPON_AFTER_START_MESSAGE << endl;
 
+    else if (game_started_check == ROUND_NOT_STARTED && command == "shoot")
+        cout << SHOOT_BEFORE_START_MESSAGE << endl;
     return game_started_check;
 }
 
@@ -339,7 +342,7 @@ bool can_buy_weapon(Round r, string in_username, string in_weapon_name)
     bool result = false;
     if (user_is_available_check(r, in_username) && weapon_is_available_check(r, in_weapon_name))
     {
-        result = ((round_already_started_check(r) == ROUND_NOT_STARTED) && 
+        result = ((round_already_started_check(r, "buy") == ROUND_NOT_STARTED) && 
         !player_has_this_weapon_check(r, in_username, in_weapon_name) &&
         player_has_enough_money(r, in_username, in_weapon_name));
 
@@ -433,7 +436,7 @@ void get_command(vector<string> tokens, Round &r)
         cout << START_OUTPUT_MESSAGE << endl;
     }
 
-    else if (command == "add-user")
+    else if (command == "add-user" && game_status == ROUND_NOT_STARTED)
         r.add_user_command(tokens[1], tokens[2]);
     
     else if (command == "get-money")
