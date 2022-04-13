@@ -57,6 +57,7 @@ const string DEAD_ATTACKER_MESSAGE = "attacker is dead";
 const string DEAD_DEFENDER_MESSAGE = "attacked is dead";
 const string PLAYERS_ARE_SAME_TEAM_MESSAGE = "you can't shoot this player";
 const string SHOOT_BEFORE_START_MESSAGE = "The game hasn't started yet";
+const string SUCCESSFUL_SHOOT_MESSAGE = "nice shot";
 class Weapon
 {
     public:
@@ -65,12 +66,14 @@ class Weapon
 
         string get_name() { return name; }
         long int get_price() { return price; }
+        int get_damage() { return damage; }
+        long int get_kill_prize() { return kill_prize; }
     private:
         string name;
         int type;
         long int price;
         int damage;
-        int kill_prize;
+        long int kill_prize;
 };
 
 Weapon::Weapon(int in_type)
@@ -129,6 +132,11 @@ class Player
         void set_play_status(int status) { play_status = status; }; 
         void set_tag(int in_tag) { tag = in_tag; }
         void set_bought_weapon(Weapon bought_weapon);
+        void set_shoot_status(Player &defender, Weapon weapon);
+        void set_health(int damage);
+        void set_kill_count() { kill_count++ ;}
+        void set_death_count() { death_count++ ;}
+        void set_money(long int prize) { money += prize; }
     private:
         string username;
         string team;
@@ -161,6 +169,23 @@ void Player:: set_bought_weapon(Weapon bought_weapon)
    weapons.push_back(bought_weapon);
    money = money - bought_weapon.get_price();
 }
+void Player:: set_health(int damage)
+{
+    health -= damage;
+    if (health < DEATH_HEALTH)
+        health = DEATH_HEALTH;
+}
+
+void Player:: set_shoot_status(Player &defender, Weapon weapon)
+{
+    defender.set_health(weapon.get_damage());
+    if (defender.get_health() == DEATH_HEALTH)
+    {
+        (*this).set_kill_count();
+        defender.set_death_count();
+        (*this).set_money(weapon.get_kill_prize());
+    }
+}
 class Round
 {
     public:
@@ -174,8 +199,11 @@ class Round
         string get_name(int i) { return players[i].get_username(); }
         vector<Player> get_players() { return players; }
         vector<Weapon> get_weapons() { return weapons; }
+        Player* get_exact_player(int index) { return &players[index]; }
         bool get_game_status() { return game_status; }
         void buy_command(string in_username, string in_weapon_name);
+        void shoot_command(string in_attacker_username, 
+               string in_defender_username, string in_weapon_name); 
         void get_money_command(string in_username);
         void get_health_command(string in_username);
         void set_game_status(bool in_status) { game_status = in_status; }
@@ -396,6 +424,7 @@ bool are_players_in_same_teams(Round r, string in_attacker_username, string in_d
 
     return are_in_same_team;
 }
+
 bool can_shoot(Round r, string in_attacker_username, 
                string in_defender_username, string in_weapon_name)
 {
@@ -404,9 +433,27 @@ bool can_shoot(Round r, string in_attacker_username,
     user_is_available_check(r, in_defender_username) &&
     attacker_has_weapon_to_shoot(r, in_attacker_username, in_weapon_name))
     {
-        //
+        result = ((round_already_started_check(r, "shoot") == ROUND_STARTED) &&
+                    !is_player_dead_check(r, in_attacker_username, ATTACKER) &&
+                    !is_player_dead_check(r, in_defender_username, DEFENDER) &&
+                    !are_players_in_same_teams(r, in_attacker_username, in_defender_username));
     }
-    return true;
+    return result;
+}
+
+void Round:: shoot_command(string in_attacker_username, 
+               string in_defender_username, string in_weapon_name) 
+{
+    if (can_shoot(*this, in_attacker_username, in_defender_username, in_weapon_name))
+    {
+        int attacker_index = find_player_index_by_username(in_attacker_username);
+        int defender_index = find_player_index_by_username(in_defender_username);
+        int weapon_index = find_weapon_index_by_name(in_weapon_name);
+        Weapon used_weapon(weapon_index + 1);
+
+       players[attacker_index].set_shoot_status(players[defender_index], used_weapon);
+        cout << SUCCESSFUL_SHOOT_MESSAGE << endl;
+    }
 }
 /******************************************************************************/
 
@@ -454,6 +501,8 @@ void get_command(vector<string> tokens, Round &r)
     else if (command == "buy")
         r.buy_command(tokens[1], tokens[2]);
 
+    else if (command == "shoot")
+        r.shoot_command(tokens[1], tokens[2], tokens[3]);
     
  
 }
