@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
+#include <algorithm>
 /*
 
 A) get_command refactor?
@@ -60,6 +60,8 @@ const string SHOOT_BEFORE_START_MESSAGE = "The game hasn't started yet";
 const string SUCCESSFUL_SHOOT_MESSAGE = "nice shot";
 const string COUNTER_TERRORIST_WIN_MESSAGE = "counter-terrorist won";
 const string TERRORIST_WIN_MESSAGE = "terrorist won";
+const string COUNTER_SCOREBOARD_MESSAGE = "counter-terrorist players:";
+const string TERRORIST_SCOREBOARD_MESSAGE = "terrorist players:";
 class Weapon
 {
     public:
@@ -126,6 +128,8 @@ class Player
         int get_tag() { return tag; }
         string get_team() { return team; }
         vector<Weapon> get_weapons() { return weapons; }
+        int get_kill_count() { return kill_count; }
+        int get_death_count() { return death_count; }
         void set_play_status(int status) { play_status = status; }; 
         void set_tag(int in_tag) { tag = in_tag; }
         void set_bought_weapon(Weapon bought_weapon);
@@ -206,6 +210,7 @@ class Round
         void go_status_command(int status, string in_username);
         void make_weapons();
         void round_end();
+        void score_board_command();
 
     private:
         bool game_status;
@@ -478,6 +483,46 @@ void Round:: round_end()
     
 }
 
+void print_scoreboead(vector<Player> counters, vector<Player> terrors)
+{
+    cout << COUNTER_SCOREBOARD_MESSAGE << endl;
+    for (int i = 0; i < counters.size(); i++)
+        cout << counters[i].get_username() << " " << counters[i].get_kill_count() << " " << 
+        counters[i].get_death_count() << endl; 
+    
+        cout << TERRORIST_SCOREBOARD_MESSAGE << endl;
+    for (int i = 0; i < terrors.size(); i++)
+        cout << terrors[i].get_username() << " " << terrors[i].get_kill_count() << " " << 
+        terrors[i].get_death_count() << endl; 
+}
+bool cmp_players(Player p1, Player p2)
+{
+    if (p1.get_kill_count() != p2.get_kill_count())
+        return (p1.get_kill_count() > p2.get_kill_count());
+    else if (p1.get_death_count() != p2.get_death_count())
+        return (p1.get_death_count() < p2.get_death_count());
+    else
+        return (p1.get_username() < p2.get_username());
+}
+
+vector<Player> devide_teams(vector<Player> players, string team)
+{
+    vector<Player> devided_team;
+    for (int i = 0; i < players.size(); i++)
+        if (players[i].get_team() == team)
+            devided_team.push_back(players[i]);
+
+    return devided_team;
+}
+void Round:: score_board_command()
+{
+    vector<Player> counter_members = devide_teams(players, COUNTER_TERRORIST);
+    vector<Player> terrorist_members = devide_teams(players, TERRORIST);
+    sort(counter_members.begin(), counter_members.end(), cmp_players);
+    sort(terrorist_members.begin(),terrorist_members.end(), cmp_players);
+    
+    print_scoreboead(counter_members, terrorist_members);
+}
 /******************************************************************************/
 
 vector<string> parse_line(string line)
