@@ -179,11 +179,13 @@ void Player:: set_health(int damage)
 void Player:: set_shoot_status(Player &defender, Weapon weapon)
 {
     defender.set_health(weapon.get_damage());
-    if (defender.get_health() == DEATH_HEALTH)
+    if (defender.health == DEATH_HEALTH)
     {
         (*this).set_kill_count();
-        defender.set_death_count();
         (*this).set_money(weapon.get_kill_prize());
+        defender.set_death_count();
+        for (int i = 0; i < defender.weapons.size() - 1; i++)
+            defender.weapons.pop_back();
     }
 }
 class Round
@@ -520,7 +522,7 @@ void Round:: score_board_command()
     vector<Player> terrorist_members = devide_teams(players, TERRORIST);
     sort(counter_members.begin(), counter_members.end(), cmp_players);
     sort(terrorist_members.begin(),terrorist_members.end(), cmp_players);
-    
+
     print_scoreboead(counter_members, terrorist_members);
 }
 /******************************************************************************/
@@ -587,6 +589,8 @@ void get_input()
 } 
 int main()
 {
+    //int num_rounds;
+    //cin >> num_rounds;
     Round r(3);
     r.make_weapons();
     string line;
@@ -596,7 +600,7 @@ int main()
         getline(cin, line);
         tokens = parse_line(line);
         get_command(tokens, r);
-        r.round_end();
+        //r.round_end();
         
     }int round_nums;
 
