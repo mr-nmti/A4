@@ -561,9 +561,8 @@ vector<string> parse_line(string line)
     return tokens;
 }
 
-void get_command(vector<string> tokens, Game &game)
+void process_command(vector<string> tokens, Game &game)
 {   
-    
     bool game_status = ROUND_NOT_STARTED;
     string command = tokens[0];
     if (command == "start" && game_status == ROUND_NOT_STARTED)
@@ -597,29 +596,16 @@ void get_command(vector<string> tokens, Game &game)
         game.score_board_command();
 }
 
-void get_input()
+void play(Game game)
 {
-    int round = 4;
+    int round_number;
+    cin >> round_number;
     string line;
-    for (int i = 0; i < round; i++)
-    {
-        vector<string> tokens;// name should be changed
-        getline(cin, line);
-        tokens = parse_line(line);
-    }
-} 
-int main()
-{
-    int num_rounds;
-    cin >> num_rounds;
-    Game game;
-    game.make_weapons();
-    string line;
-    vector<string> tokens;// name should be changed
-    for (int i = 0; i < num_rounds; i++)
+    vector<string> tokens;
+    for (int i = 0; i < round_number; i++)
     {
         int round_command_number;
-        while(1)
+        while(true)
         {
             getline(cin, line);
             tokens = parse_line(line);
@@ -628,21 +614,29 @@ int main()
                 round_command_number = stoi(tokens[1]);
                 break;
             }
-            get_command(tokens, game);
+            process_command(tokens, game);
         }
         for (int j = 0; j < round_command_number; j++)
         {
             getline(cin, line);
             tokens = parse_line(line);
-            get_command(tokens, game);
+            process_command(tokens, game);
         }
+        
         game.round_finished();
     }
+
     string remaining_command;
     while(cin >> remaining_command)
         if (remaining_command == "score-board")
             game.score_board_command();
-    int round_nums;
+}
+
+int main()
+{
+    Game game;
+    game.make_weapons();
+    play(game);
 
     return 0;
 }
