@@ -37,6 +37,9 @@ constexpr bool DEAD = true;
 constexpr bool ALIVE = false;
 constexpr int ATTACKER = 1;
 constexpr int DEFENDER = 2;
+constexpr int NO_RESULT = 0;
+constexpr int WIN = 1;
+constexpr int LOSE = 2;
 constexpr long int INITIAL_MONEY = 1000;
 constexpr int INITIAL_HEALTH = 100;
 constexpr int INITIAL_TAG = -1;
@@ -138,6 +141,7 @@ class Player
         void set_kill_count() { kill_count++ ;}
         void set_death_count() { death_count++ ;}
         void set_money(long int prize) { money += prize; }
+        void modify_after_round(string winner_team);
     private:
         string username;
         string team;
@@ -148,6 +152,7 @@ class Player
         int kill_count;
         vector<Weapon> weapons;
         int tag;
+        //int round_result;
 };
 
 Player::Player(string in_username, string in_team)
@@ -162,6 +167,7 @@ Player::Player(string in_username, string in_team)
     kill_count = 0;
     tag = INITIAL_TAG;
     weapons.push_back(Weapon(INITIAL_WEAPON));
+    //round_result = NO_RESULT;
 }
 
 void Player:: set_bought_weapon(Weapon bought_weapon)
@@ -181,12 +187,21 @@ void Player:: set_shoot_status(Player &defender, Weapon weapon)
     defender.set_health(weapon.get_damage());
     if (defender.health == DEATH_HEALTH)
     {
-        (*this).set_kill_count();
-        (*this).set_money(weapon.get_kill_prize());
+        this->set_kill_count();
+        this->set_money(weapon.get_kill_prize());
         defender.set_death_count();
         for (int i = 0; i < defender.weapons.size() - 1; i++)
             defender.weapons.pop_back();
     }
+}
+
+void Player:: modify_after_round(string winner_team)
+{
+    this->health = INITIAL_HEALTH;
+    if (this->team == winner_team)
+        this->set_money(2700);
+    else
+        this->set_money(2400);
 }
 class Round
 {
@@ -464,7 +479,7 @@ void Round:: shoot_command(string in_attacker_username,
 
 int num_alive_team_members(vector<Player> players, string team)
 {
-    int number;
+    int number = 0;
     for (int i = 0; i < players.size(); i++)
         if (players[i].get_team() == team && players[i].get_health() != DEATH_HEALTH &&
             players[i].get_play_status() != AFK)
@@ -477,11 +492,19 @@ void Round:: round_end()
 {
     int num_of_alive_counters = num_alive_team_members(players, COUNTER_TERRORIST);
     int num_of_alive_terrors = num_alive_team_members(players, TERRORIST);
+    string winner_team;
     if (num_of_alive_terrors == 0 || (num_of_alive_terrors != 0 && num_of_alive_counters != 0))
+    {    
+        winner_team = COUNTER_TERRORIST;
         cout << COUNTER_TERRORIST_WIN_MESSAGE << endl;
-    
+    }
     if (num_of_alive_counters == 0)
+    {   
+        winner_team = TERRORIST;
         cout << TERRORIST_WIN_MESSAGE << endl;
+    }
+    for (int i = 0; i < players.size(); i++)
+        players[i].modify_after_round(winner_team);
     
 }
 
@@ -574,6 +597,8 @@ void get_command(vector<string> tokens, Round &r)
     else if (command == "shoot")
         r.shoot_command(tokens[1], tokens[2], tokens[3]);
     
+    else if (command == "score-board")
+        r.score_board_command();
  
 }
 void get_input()
@@ -589,20 +614,39 @@ void get_input()
 } 
 int main()
 {
-    //int num_rounds;
-    //cin >> num_rounds;
+    int num_rounds;
+    cin >> num_rounds;
     Round r(3);
     r.make_weapons();
     string line;
     vector<string> tokens;// name should be changed
-    while(1)
+    for (int i = 0; i < num_rounds; i++)
     {
-        getline(cin, line);
-        tokens = parse_line(line);
-        get_command(tokens, r);
-        //r.round_end();
-        
-    }int round_nums;
+        int round_command_number;
+        while(1)
+        {
+            getline(cin, line);
+            tokens = parse_line(line);
+            if (tokens[0] == "round")
+            {
+                round_command_number = stoi(tokens[1]);
+                break;
+            }
+            get_command(tokens, r);
+        }
+        for (int j = 0; j < round_command_number; j++)
+        {
+            getline(cin, line);
+            tokens = parse_line(line);
+            get_command(tokens, r);
+        }
+        r.round_end();
+    }
+    string remaining_command;
+    while(cin >> remaining_command)
+        if (remaining_command == "score-board")
+            r.score_board_command();
+    int round_nums;
 
     return 0;
 }
