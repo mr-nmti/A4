@@ -58,6 +58,8 @@ const string DEAD_DEFENDER_MESSAGE = "attacked is dead";
 const string PLAYERS_ARE_SAME_TEAM_MESSAGE = "you can't shoot this player";
 const string SHOOT_BEFORE_START_MESSAGE = "The game hasn't started yet";
 const string SUCCESSFUL_SHOOT_MESSAGE = "nice shot";
+const string COUNTER_TERRORIST_WIN_MESSAGE = "counter-terrorist won";
+const string TERRORIST_WIN_MESSAGE = "terrorist won";
 class Weapon
 {
     public:
@@ -203,6 +205,8 @@ class Round
         void set_game_status(bool in_status) { game_status = in_status; }
         void go_status_command(int status, string in_username);
         void make_weapons();
+        void round_end();
+
     private:
         bool game_status;
         int round_number;
@@ -450,6 +454,30 @@ void Round:: shoot_command(string in_attacker_username,
         cout << SUCCESSFUL_SHOOT_MESSAGE << endl;
     }
 }
+
+int num_alive_team_members(vector<Player> players, string team)
+{
+    int number;
+    for (int i = 0; i < players.size(); i++)
+        if (players[i].get_team() == team && players[i].get_health() != DEATH_HEALTH &&
+            players[i].get_play_status() != AFK)
+                number++;
+
+    return number;
+}
+
+void Round:: round_end()
+{
+    int num_of_alive_counters = num_alive_team_members(players, COUNTER_TERRORIST);
+    int num_of_alive_terrors = num_alive_team_members(players, TERRORIST);
+    if (num_of_alive_terrors == 0 || (num_of_alive_terrors != 0 && num_of_alive_counters != 0))
+        cout << COUNTER_TERRORIST_WIN_MESSAGE << endl;
+    
+    if (num_of_alive_counters == 0)
+        cout << TERRORIST_WIN_MESSAGE << endl;
+    
+}
+
 /******************************************************************************/
 
 vector<string> parse_line(string line)
@@ -523,6 +551,7 @@ int main()
         getline(cin, line);
         tokens = parse_line(line);
         get_command(tokens, r);
+        r.round_end();
         
     }int round_nums;
 
